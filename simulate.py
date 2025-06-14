@@ -8,10 +8,9 @@ from hyperparameters import AttackParameters
 from file_path import sam_path, processed_files_path, temp_path
 import pandas as pd
 import torch
-from multi_user_attack import perform_attacks
-from breaching.analysis.metrics import cw_ssim, mse_compute, psnr_compute
+from metrics import cw_ssim, mse_compute, psnr_compute
 from DP_model import ConvAttackModel
-import index
+from example import perform_attacks
 
 
 def bs_to_performance():
@@ -21,7 +20,7 @@ def bs_to_performance():
     ac.ap = AttackParameters(dataset)
     ac.compress_image = False
     record = pd.DataFrame(columns=['batch size', 'bin num', 'separated res', 'separated input', 'psnr', 'ssim', 'mse'])
-    for bs in range(2, 7):
+    for bs in range(2, 3):
         dc.batch_size = int(2 ** bs)
         for rounds in range(10):
             for bin_num in (1024,):
@@ -30,13 +29,12 @@ def bs_to_performance():
                 ac.num_bins = bin_num
                 # print('batch size: {0}, bins num: {1}, round {2}'.fbkormat(dc.batch_size, ac.num_bins, rounds))
                 res = perform_attacks(save_fig=False, data_cfg=dc, attack_cfg=ac, dataset=dataset, r=rounds,
-                                      use_dp=True, new_samples=False, optim=False)
+                                      use_dp=True, new_samples=True, optim=True)
                 if not res[2]:
                     # cannot optimize from noised gradients
                     continue
                 res_list = [dc.batch_size, ac.num_bins, *list(map(len, res[:-1]))]
 
-                accuracy = len(res[0]) / dc.batch_size
                 if len(res[0]) == 0:
                     print('No separated res')
                     continue
@@ -50,7 +48,7 @@ def bs_to_performance():
                 record.loc[len(record)] = res_list
                 print(ssim, psnr, mse)
 
-    record.to_json(r'evaluation/factor/bs_not_optim.json', default_handler=str)
+    record.to_json(r'evaluation/factor/bs_not_optim_cifar.json', default_handler=str)
 
 
 def privacy_factor_to_performance():
@@ -277,9 +275,9 @@ def other_attack(attack='random', dataset='ImageNet'):
         print(record.mean(axis=0))
 
 
-# bs_to_performance()
+bs_to_performance()
 # privacy_factor_to_performance()
 # different_protection('only clip')
 # value_comparison(mode='unit_abs')
-fig_quality_three_metrics(dataset='Flowers102', optim=True)
+# fig_quality_three_metrics(dataset='Flowers102', optim=True)
 # other_attack(dataset='Flowers102')

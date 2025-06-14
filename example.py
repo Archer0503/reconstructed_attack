@@ -3,7 +3,6 @@ from DP_model import ConvAttackModel
 from my_attacker import MyAttacker
 from DP_util import *
 from hyperparameters import AttackParameters
-import scipy
 from metrics import cw_ssim, psnr_compute, mse_compute
 from file_path import temp_path, processed_data_path, processed_files_path
 
@@ -82,31 +81,29 @@ if __name__ == "__main__":
     sam = sam_model_registry["default"](checkpoint=sam_path)
     sam.to('cuda')
     record = pd.DataFrame(columns=['batch size', 'bin num', 'separated res', 'separated input'])
-    for bs in (4,):
-        dc.batch_size = int(2 ** bs)
-        for rounds in range(1):
-            for bin_num in (1024,):
-                torch.cuda.empty_cache()
-                print('bs: {0}, bn: {1}, r:{2}'.format(bs, bin_num, rounds))
-                ac.num_bins = bin_num
-                # print('batch size: {0}, bins num: {1}, round {2}'.fbkormat(dc.batch_size, ac.num_bins, rounds))
-                res = perform_attacks(save_fig=True, data_cfg=dc, attack_cfg=ac, dataset=dataset, fixed_idx=True,
-                                      use_dp=True, new_samples=True, optim=True, sam=sam, filter=True)
-                if not res[2]:
-                    # cannot optimize from noised gradients
-                    continue
-                record.loc[len(record)] = [dc.batch_size, ac.num_bins, *list(map(len, res[:-1]))]
+    bsz = 4  # batch size
+    dc.batch_size = bsz
+    rounds = 1
+    bin_num = 1024
+    torch.cuda.empty_cache()
+    print('bs: {0}, bn: {1}, r:{2}'.format(bsz, bin_num, rounds))
+    ac.num_bins = bin_num
+    # print('batch size: {0}, bins num: {1}, round {2}'.fbkormat(dc.batch_size, ac.num_bins, rounds))
+    res = perform_attacks(save_fig=True, data_cfg=dc, attack_cfg=ac, dataset=dataset, fixed_idx=True,
+                          use_dp=True, new_samples=True, optim=False, sam=sam, filter=True)
+    if not res[2]:
+        print("Cannot optimize from noised gradients")
+    record.loc[len(record)] = [dc.batch_size, ac.num_bins, *list(map(len, res[:-1]))]
 
-                accuracy = len(res[0]) / dc.batch_size
-                if len(res[0]) == 0:
-                    print('No separated res')
-                    continue
+    accuracy = len(res[0]) / dc.batch_size
+    if len(res[0]) == 0:
+        print('No separated res')
 
-                separated_res = res[0]
-                separated_input = res[1]
-                ssim = cw_ssim(separated_res, separated_input)[0]
-                psnr = psnr_compute(separated_res, separated_input)[0]
-                mse = mse_compute(separated_res, separated_input)
-                # print(ssim, psnr, mse)
+    separated_res = res[0]
+    separated_input = res[1]
+    ssim = cw_ssim(separated_res, separated_input)[0]
+    psnr = psnr_compute(separated_res, separated_input)[0]
+    mse = mse_compute(separated_res, separated_input)
+    print(ssim, psnr, mse)
 
     # record.to_json(r'evaluation/factor/separation ratio.json')

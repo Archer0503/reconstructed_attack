@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-from DP.DP_model import SGM
-from DP.proposed import data_cfg_default
+from DP_model import SGM
+from proposed import data_cfg_default
 from metrics import *
 from file_path import temp_path, fig_path, processed_data_path
 
@@ -53,8 +53,8 @@ def show_image(image_path=r'recovered data.pt', col_num=16):
         # plt.imshow(tp(res[idx]))
         # plt.imshow(res[idx_list[idx]])
     plt.subplots_adjust(wspace=0.07, hspace=0)
-    # plt.show()
-    plt.savefig('evaluation/vision/imagenet when.png', dpi=600, bbox_inches='tight', pad_inches=0)
+    plt.show()
+    # plt.savefig('evaluation/vision/imagenet when.png', dpi=600, bbox_inches='tight', pad_inches=0)
 
 
 def compare_grad(mode='grad'):
@@ -205,8 +205,8 @@ def privacy_parameters(factor='epsilon'):
 
 
 # show_image_single(temp_path + '/separated res.pt')
-# show_image(temp_path + '/separated res.pt')
-show_image('evaluation/vision/imagenet when.pt')
+show_image(temp_path + '/separated res.pt')
+# show_image('intermediate_results/original data.pt')
 # compare_grad('unit value')
 # factor_to_performance('batch size', 'ssim', 'bs')
 # factor_to_performance('bin num', 'accuracy', 'bin num')

@@ -1,6 +1,6 @@
 import torch
-from DP.DP_model import SGM, ConvAttackModel
-from DP.my_attacker import get_std, MyAttacker
+from DP_model import SGM, ConvAttackModel
+from my_attacker import get_std, MyAttacker
 import pandas as pd
 from DP_util import get_samples, attack_cfg_default, data_cfg_default, get_clipping_bound
 from metrics import cw_ssim, psnr_compute, mse_compute
