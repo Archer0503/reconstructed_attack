@@ -55,7 +55,7 @@ The following are the requirements for the implementation of this attack.
 
 ### 1. Dataset
 We use four datasets in the experiments. The default dataset is ImageNet, please download it before you run this attack:
-https://www.image-net.org/.
+https://www.image-net.org/. 
 
 ### 2. SAM
 
@@ -66,7 +66,8 @@ Besides, you also need to download the latest SAM model checkpoint to your local
 ### 3. Dependency path
 
 After you download the dataset and SAM, please provide their local path in `dataset_path` and `sam_path` of `file_path.py`.
-
+* `dataset_path` should be a folder that contains "ImageNet2012" folder insted of a path like "xxx/ImageNet2012" (to support different datasets).
+* `sam_path` should be something like "xxx\sam_vit_h_4b8939.pth".
 ---
 
 ## Try with a given example
