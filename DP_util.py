@@ -94,13 +94,6 @@ def get_samples(image_idx=[], device='cuda', dataset='ImageNet', batch_size=16):
     return datapoint, labels
 
 
-def get_clipping_bound(model, model_name, pretrained=False):
-    if model == 'resnet':
-        grad = pd.read_json(r'H:\pycharm projects\breaching-main\DP\performance\grad res.json')
-
-        return grad[(grad['model'] == model_name) & (grad['pretrained'] == pretrained)]['norm'].mean()
-
-
 def get_std(clipping_bound, epsilon=100, constant=1, aggregation_time=25, max_upload=2, user_num=100,
             min_db_size=1000):
     '''condition = aggregation_time ** 2 - max_upload ** 2 * user_num
@@ -171,38 +164,6 @@ def select_main_object(sam, samples, device='cuda'):
         samples[i] = tt(image).to(device)
         samples[i][:, np.invert(optimal_mask)] = 0
     return torch.stack(samples).to(device), optimal_mask_list
-
-
-def minus_by_mean(samples, masks):
-    """
-    input:
-    samples -> torch.tensor: batch_size * channel * w * h
-    masks -> np.array: batch_size * w * h
-    return:
-    processed samples = sample - channel_wise mean: same size with input
-    original samples
-    means: batch_size * channel
-    """
-    means = []
-    samples = samples.to('cpu')
-    process_samples = torch.clone(samples)
-    for i in range(len(samples)):
-        mean = samples[i, :, masks[i]].mean(dim=1)
-        process_samples[i, :, masks[i]] -= mean.unsqueeze(dim=1)
-        means.append(mean)
-    return process_samples, samples, torch.stack(means)
-
-
-def avg_noise(user_num, std, size):
-    """
-    To calculate the average noise of multiple users. For avoiding occupying too much memory (user num * size),
-    use 'for' to substitute a large tensor
-    """
-    '''noise = torch.normal(mean=0, std=std, size=size) / (other_user_num + 1)
-    for _ in range(other_user_num-1):
-        noise += torch.normal(mean=0, std=std, size=size) / (other_user_num + 1)'''
-    noise = torch.normal(0, std, (user_num-1, *size)).sum(dim=0) / user_num
-    return noise
 
 
 if __name__ == '__main__':

@@ -107,6 +107,8 @@ The following is a description of some of the files:<br>
   * `data_cfg_default`: Default sample processing config used in the attack.
   * `clip_and_perturb`: Clippng and perturb generated gradients according to the given privacy parameters.
   * `select_main_object`: Select the main object of samples using SAM.
-* **attacker.py**: In this file we define the `Attacker` class to support the implementation of attack. The main process of the attack is implemented in the `Attacker.conv_reconstruct` function.
-* **DP_model.py**: Defining the malicious structure in `ConvAttackModel` class. `ConvAttackModel` will modify the given model (data_cfg.model) via data and attack config as given in the paper. The method of embedding sample information into the gradient discussed in the paper is implemented by customizing the `forward` function.
-* **file_path.py**: Setting the file addresses for models, databases, and results
+* **attacker.py** : In this file we define the `Attacker` class to support the implementation of attack. The main process of the attack is implemented in the `Attacker.conv_reconstruct` function.
+* **DP_model.py** : Defining the malicious structure in `ConvAttackModel` class. `ConvAttackModel` will modify the given model (data_cfg.model) via data and attack config as given in the paper. The method of embedding sample information into the gradient discussed in the paper is implemented by customizing the `forward` function.
+* **file_path.py** : Setting the file addresses for models, databases, and results.
+* **attack_params.py** : Optimization factor setting used in the attack.
+* **metrics.py** : Defining metrics to evaluate the attack.

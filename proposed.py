@@ -1,6 +1,6 @@
 import torch
 from DP_model import SGM, ConvAttackModel
-from my_attacker import get_std, MyAttacker
+from attacker import get_std, Attacker
 import pandas as pd
 from DP_util import get_samples, attack_cfg_default, data_cfg_default, get_clipping_bound
 from metrics import cw_ssim, psnr_compute, mse_compute
@@ -28,7 +28,7 @@ def perform_attacks(save_fig=True, data_cfg=data_cfg_default(), attack_cfg=attac
     secrets = {"ImprintBlock": secret}
 
     # This is the attacker:
-    attacker = MyAttacker(model, loss_fn, attack_cfg, data_cfg, setup)
+    attacker = Attacker(model, loss_fn, attack_cfg, data_cfg, setup)
 
     # ## Simulate an attacked FL protocol
     # Server-side computation:
