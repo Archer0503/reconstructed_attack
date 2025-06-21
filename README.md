@@ -1,9 +1,14 @@
-# Privacy Does Not Work: A Sample Reconstruction Attack against Federated Learning with Differential Privacy
+# Local Differential Privacy Is Not Enough: A Sample Reconstruction Attack Against Federated Learning With Local Differential Privacy
 
-**The implementation of paper:<br>
-Privacy Does Not Work: A Sample Reconstruction Attack against Federated Learning with Differential Privacy**
+The implementation of our paper:<br>
+**Local Differential Privacy Is Not Enough: A Sample Reconstruction Attack Against Federated Learning With Local Differential Privacy.**<br>
 
-We propose an attack against federated learning (FL) with differential privacy (DP) in which gradients uploaded by
+The paper is available on:<br>
+IEEE TIFS version: https://ieeexplore.ieee.org/document/10793076;<br>
+arXiv with complete appendix: https://arxiv.org/abs/2502.08151.
+
+
+We propose an attack against federated learning (FL) with local differential privacy (DP) in which gradients uploaded by
 users are clipped and perturbed.
 
 Here are some examples:
@@ -18,7 +23,7 @@ Here are some examples:
 ![when.png](fig%2Fwhen.png)
 
 Other attacks are implemented by Jonas Geiping. If you are interested in more reconstruction samples in FL, please check
-out his project: https://github.com/JonasGeiping/breaching
+out his project: https://github.com/JonasGeiping/breaching.
 
 ---
 
@@ -67,4 +72,41 @@ After you download the dataset and SAM, please provide their local path in `data
 ## Try with a given example
 
 After meeting the above requirement, try `python example.py` for a given example.
+When all goes well, you will see the following output in the console:
 
+```text
+Performing attack with parameters: batch_size=16, bin_num=1024, used_dp=True, dataset=ImageNet, fixed_idx=True, optim=False, filter=True
+Processing samples...
+Generating gradients...
+Adding noise...
+Performing attack...
+Reconstructed 16 samples from gradients.
+Saving results...
+Done!
+```
+And you will see the result plot automatically rendered with Matplotlib.
+![display.png](fig%2Fdisplay.png)
+
+---
+### Configurable parameters
+Here are some attack parameters that you might be interested in:<br>
+* **bsz**  (`int`, default: 16): The batch size used for gradient generation in the attack. <br>
+* **bin_num**  (`int`, default: 1024): The number of units in the separation layer. <br>
+* **used_dp** (`bool`, default: `True`): Whether differential privacy is applied to gradients (e.g., through clipping and perturbing gradients). <br>
+* **fixed_idx** (`bool`, default: `True`): Whether to use a fixed dataset sample index. The attack would generate the same results when setting `True`; using random samples when setting `False`.<br>
+* **fig_idx** (`list` of `int`): Only works when `fixed_idx` is `True`, the index of samples used in the attack.<br>
+* **dataset** (`str`, default:"ImageNet"): The dataset used in the attack. Option: ["ImageNet", "CIFAR100", "Caltech256", "Flowers102"]. To support more dataset, you can modify `get_samples` method in `DP_util.py` files and add the corresponding dataset and transforms.<br>
+* **optim** (`bool`, default: `False`): Whether the quality of the reconstructed samples is improved through optimization methods. When set to True, the attack result will be enhanced by the optimizer, which also increases the running time. <br>
+* **filter** (`bool`, default: `True`): Whether to remove noise of reconstrcuted samples through a filter with inferred noise confidence interval. <br>
+
+---
+### File description
+The following is a description of some of the files:<br>
+* **DP_util.py** : Some basic methods and parameter settings are given. Here are descriptions of some of these methods or setting: <br>
+  * `attack_cfg_default` : Default attack config used in the attack.
+  * `data_cfg_default`: Default sample processing config used in the attack.
+  * `clip_and_perturb`: Clippng and perturb generated gradients according to the given privacy parameters.
+  * `select_main_object`: Select the main object of samples using SAM.
+* **attacker.py**: In this file we define the `Attacker` class to support the implementation of attack. The main process of the attack is implemented in the `Attacker.conv_reconstruct` function.
+* **DP_model.py**: Defining the malicious structure in `ConvAttackModel` class. `ConvAttackModel` will modify the given model (data_cfg.model) via data and attack config as given in the paper. The method of embedding sample information into the gradient discussed in the paper is implemented by customizing the `forward` function.
+* **file_path.py**: Setting the file addresses for models, databases, and results
